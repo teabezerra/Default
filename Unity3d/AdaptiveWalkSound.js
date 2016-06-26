@@ -1,6 +1,7 @@
 ﻿#pragma strict
 
-// Pequeno script para controle de audio de passos em diversos terrenos
+// Script para controle de audio de passos em diversos terrenos
+//
 // Permite alternar dinamicamente o audio clip para cada tipo de terreno
 // Cria uma pequena variação de pitch, dando maior sensação de imersão de cena
 // A Vantagem da utilização deste método é o maior realismo pois o som nunca será exatamente o mesmo e só sera disparado no contato do solo com o pé do personagem. O que elimina problema de sincronismo com a velocidade da animação.
