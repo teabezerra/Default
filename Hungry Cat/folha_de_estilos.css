@@ -1,0 +1,143 @@
+canvas{
+    border-radius: 30px 30px 30px 30px;
+	  border-radius: 30px 30px 30px 30px;
+}
+
+#div_canvas{
+    width: 800px;
+    height: 600px;
+    border-radius: 30px 30px 30px 30px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -400px;
+    margin-top: -300px;
+    border: thin double #CCC;
+    background-image: url(images/bg1.png);
+    background-repeat: no-repeat;
+
+    box-shadow: -5px -10px 30px #900, 6px 9px 15px #c09;
+    -webkit-box-shadow: -5px -10px 30px #900, 6px 9px 15px #c09;
+    -moz-box-shadow: -5px -10px 30px #900, 6px 9px 15px #c09;
+
+}
+
+
+#quadro_pause {
+    width: 800px;
+    height: 600px;
+    border-radius: 30px 30px 30px 30px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    visibility: hidden;
+    background-image: url(images/bg2.jpg);
+    background-repeat: no-repeat;
+        opacity:0.9;
+    filter:alpha(opacity=90); /* For IE8 and earlier */
+}
+
+#div_cat{
+    width: 360px;
+    height: 357px;
+    position: absolute;
+    left: 216px;
+    top: 118px;
+    //border: thin double #CCC;
+    background-image: url(images/bg3.gif);
+    background-repeat: no-repeat;
+}
+
+#quadro_help{
+
+    width: 700px;
+    height: 500px;
+    position: absolute;
+    top: 55px;
+    left: 50px;
+    visibility: hidden;
+    opacity:0.9;
+    filter:alpha(opacity=90); /* For IE8 and earlier */
+    background: #ffffff;
+
+}
+
+
+#bt_PlayGame{
+    width: 50px;
+    height: 50px;
+    border: thin double #CCC;
+    position: absolute;
+    left: 625px;
+    top: 5px;
+    visibility: hidden;
+    background-image:  url(images/botoes/bt_play.png);
+    background-repeat: no-repeat;
+    opacity:0.7;
+    filter:alpha(opacity=70); /* For IE8 and earlier */
+}
+
+
+#bt_PauseGame{
+    width: 50px;
+    height: 50px;
+    visibility: hidden;
+    border: thin double #CCC;
+    position: absolute;
+    left: 675px;
+    top: 5px;
+    background-image: url(images/botoes/bt_pause.png);
+    background-repeat: no-repeat;
+    opacity:0.7;
+    filter:alpha(opacity=70); /* For IE8 and earlier */
+}
+
+
+#bt_mute{
+    width: 50px;
+    height: 50px;
+    border: thin double #CCC;
+    position: absolute;
+    left: 725px;
+    top: 5px;
+    visibility: hidden;
+    background-image: url(images/botoes/bt_som_on.png);
+    background-repeat: no-repeat;
+    opacity:0.7;
+    filter:alpha(opacity=70); /* For IE8 and earlier */
+}
+
+
+
+
+
+
+#bt_start{
+    width: 250px;
+    height: 63px;
+    position: absolute;
+    left: 87px;
+    top: 487px;
+    //   border: thin double #CCC;
+}
+
+#bt_info{
+    width: 170px;
+    height: 55px;
+    position: absolute;
+    left: 508px;
+    top: 493px;
+    // border: thin double #CCC;
+}
+
+
+
+
+
+body {
+    background-attachment: scroll;
+    // background-image: url(images/backgrounds/bg5.jpg);
+    background-repeat: repeat;
+}
+
+

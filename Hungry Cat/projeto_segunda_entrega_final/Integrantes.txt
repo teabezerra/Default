@@ -1,0 +1,24 @@
+Integrantes
+
+Denis Benvenuti			133874-9
+Gabrielle Ghenov		134888-4
+Manuela Reis			134876-1
+Ricardo Mendonça		130823-8
+Thales Bezerra			133798-0
+
+
+
+Sobre o jogo:
+
+
+O game "Hungry Cat" é uma criação dos alunos supracitados. 
+
+Objetivos:
+
+	1 - sobreviver o maior tempo posivel para passar de fase.
+	2 - Fugir dos elementos que piscam. Eles tiram pontos e quando os pontos acabam, o gato perde uma vida, quando as vidas acabam, o jogo termina.
+	3 - Pegar o maior numero de limentos possivel, mas cuidado, quanto maior o level, maior a velocidade dos itens, mas eles darao ou rirarao mais pontos tambem.
+	
+ 
+
+

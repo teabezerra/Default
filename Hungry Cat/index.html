@@ -1,0 +1,605 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+        <link href="folha_de_estilos.css" rel="stylesheet" type="text/css" />
+        <script language="javascript" src="jquery.min.js" type="text/javascript"></script>
+        <script language="javascript" src="jquery.hotkeys.js" type="text/javascript"></script>
+        <script language="javascript" src="key_status.js" type="text/javascript"></script>
+        <script language="javascript" src="sprite.js" type="text/javascript"></script>
+
+
+        <script type="text/javascript">
+
+            var CANVAS_WIDTH_LARGURA;
+            var CANVAS_HEIGHT_ALTURA;
+            var canvas;
+            var FPS;
+            var player;
+            var vet_alimentos1;
+            var ball;
+            var atualizar;
+            var intervalo;
+            var qtd_pontos;
+            var x_texto_qtd_pontos;
+            var y_texto_qtd_pontos;
+            var fase;
+            var vidas;
+            var intervalo_level;
+            var tempo_level;
+
+
+            function inicializaJogo()
+            {
+
+                /**********************************************************************************
+                 * Inicializando as variaves globais
+                 **********************************************************************************/
+                CANVAS_WIDTH_LARGURA = 800;
+                CANVAS_HEIGHT_ALTURA = 600;
+                vet_alimentos1 = [];
+                FPS = 60;
+                atualizar = true;
+                fase = 1;
+                vidas = 3;
+                tempo_level = 0;
+
+                /**********************************************************************************
+                 * Inicializando canvas
+                 **********************************************************************************/
+                canvas = document.getElementById("div_do_canvas").getContext("2d");
+
+
+
+
+                criarBackground0();
+
+                /**********************************************************************************
+                 * Iniciando Elementos iniciais
+                 **********************************************************************************/
+                criaJogador();
+
+                /**********************************************************************************
+                 * Configurando o loop do jogo update <> draw
+                 **********************************************************************************/
+                if (intervalo != null)
+                    clearInterval(intervalo);
+
+                intervalo = setInterval("loopJogo()", 1000 / FPS);
+
+                if (intervalo_level != null)
+                    clearInterval(intervalo_level);
+
+                intervalo_level = setInterval("updateLevel()", 1000);
+
+                document.getElementById("div_cat").style.visibility = "hidden";
+                document.getElementById("bt_PlayGame").style.visibility = "visible";
+                document.getElementById("bt_mute").style.visibility = "visible";
+                document.getElementById("bt_PauseGame").style.visibility = "visible";
+                document.getElementById("bt_PlayGame").style.backgroundImage = "url(images/botoes/bt_restart.png)";
+                document.getElementById("bt_start").style.visibility = "hidden";
+                document.getElementById("bt_info").style.visibility = "hidden";
+
+
+
+
+                qtd_pontos = 0;
+                x_texto_qtd_pontos = 30;
+                y_texto_qtd_pontos = 30;
+
+                canvas.font = '20pt Calibri';
+                canvas.lineWidth = 1;
+                // stroke color
+                var gradient = canvas.createLinearGradient(0, 0, CANVAS_WIDTH_LARGURA / 2, 0);
+                gradient.addColorStop("0", "magenta");
+                gradient.addColorStop("0.5", "blue");
+                gradient.addColorStop("1.0", "red");
+                // Fill with gradient
+                canvas.strokeStyle = gradient;
+
+            }
+
+            function pausaJogo()
+            {
+                if (atualizar) {
+                    atualizar = false;
+                    document.getElementById("bt_PauseGame").style.backgroundImage = "url(images/botoes/bt_pause.png)";
+                    document.getElementById('quadro_pause').style.visibility = 'visible';
+                }
+                else {
+                    atualizar = true;
+                    document.getElementById("bt_PauseGame").style.backgroundImage = "url(images/botoes/bt_play.png)";
+                    document.getElementById('quadro_pause').style.visibility = 'hidden';
+                }
+            }
+
+            function updateLevel()
+            {
+                if (atualizar) {
+                    if (++tempo_level == 60) {
+                        tempo_level = 0;
+                        ++fase;
+                    }
+                } else {
+
+                }
+
+            }
+
+
+
+
+            function loopJogo()
+            {
+
+
+                if (atualizar) {
+
+                    /**********************************************************************************
+                     * Executando executar o Draw()
+                     **********************************************************************************/
+                    update();
+
+                    /**********************************************************************************
+                     * Voltado a executar o Draw()
+                     **********************************************************************************/
+                    draw();
+
+                } else {
+
+                }
+
+            }
+
+
+
+
+            function update()
+            {
+
+                if (Math.random() < fase / 100)
+                    vet_alimentos1.push(criadorAlimentos());
+
+
+                if (keydown.left)
+                    player.move(-5);
+                if (keydown.right)
+                    player.move(5);
+                if (!keydown.left && !keydown.right)
+                    player.move(0);
+
+
+                if (keydown.up || keydown.space)
+                {
+                    if (ball == null)
+                        ball = disparadorDeBolas();
+                    else if (!ball.active)
+                        ball = disparadorDeBolas();
+                }
+                if (ball != null)
+                    ball.update();
+
+                updateAlimentos();
+
+            }
+
+            function updateAlimentos() {
+
+                for (i = 0; i < vet_alimentos1.length; i++)
+                    vet_alimentos1[i].update();
+
+            }
+
+            function draw()
+            {
+                limpaTela();
+
+                bg0.draw();
+
+                player.draw();
+
+                for (i = 0; i < vet_alimentos1.length; i++)
+                    vet_alimentos1[i].draw();
+
+                if (ball != null)
+                    ball.draw();
+
+                canvas.strokeText('Pontos: ' + qtd_pontos, x_texto_qtd_pontos, y_texto_qtd_pontos);
+                canvas.strokeText('Vidas:  ' + vidas, x_texto_qtd_pontos, y_texto_qtd_pontos + 30);
+                canvas.strokeText('Level:  ' + fase, x_texto_qtd_pontos, y_texto_qtd_pontos + 60);
+
+                var time = 60 - tempo_level;
+
+                if (time < 10)
+                    canvas.strokeText('00:0' + time, CANVAS_WIDTH_LARGURA / 2 - 40, y_texto_qtd_pontos);
+                else if (time < 60)
+                    canvas.strokeText('00:' + time, CANVAS_WIDTH_LARGURA / 2 - 40, y_texto_qtd_pontos);
+                else
+                    canvas.strokeText('01:00', CANVAS_WIDTH_LARGURA / 2 - 40, y_texto_qtd_pontos);
+            }
+
+
+
+
+            function limpaTela()
+            {
+                canvas.fillStyle = "#E09999";
+                canvas.fillRect(0, 0, CANVAS_WIDTH_LARGURA, CANVAS_HEIGHT_ALTURA);
+            }
+
+
+            var bg0;
+            function criarBackground0()
+            {
+                bg0 = {
+                    color: "#FFF",
+                    width: CANVAS_WIDTH_LARGURA,
+                    height: CANVAS_HEIGHT_ALTURA,
+                    x: 0,
+                    y: 0,
+                    sprite: Sprite("bg0"),
+                    draw: function()
+                    {
+                        this.sprite.draw(canvas, this.x, this.y);
+                    },
+                }
+            }
+
+
+
+            var cont_sprite_time;
+            function criaJogador()
+            {
+                cont_sprite_time = 0;
+                player = {
+                    color: "#00A",
+                    width: 71,
+                    height: 74,
+                    x: ((CANVAS_WIDTH_LARGURA / 2) - 37),
+                    y: (CANVAS_HEIGHT_ALTURA - 71),
+                    x_antigo: this.x,
+                    sprite1: Sprite("gato1"),
+                    sprite2: Sprite("gato2"),
+                    sprite3: Sprite("gato3"),
+                    sprite4: Sprite("gato2"),
+                    sprite5: Sprite("gato4"),
+                    sprite6: Sprite("gato5"),
+                    sprite7: Sprite("gato6"),
+                    sprite8: Sprite("gato5"),
+                    sprite9: Sprite("gato1"),
+                    sprite10: Sprite("gato2"),
+                    sprite11: Sprite("gato3"),
+                    sprite12: Sprite("gato2"),
+                    draw: function()
+                    {
+
+                        ++cont_sprite_time;
+
+                        if (this.x_antigo > this.x) {
+                            if (cont_sprite_time < 30)
+                            {
+                                this.sprite1.draw(canvas, this.x, this.y);
+                            } else if (cont_sprite_time < 40)
+                            {
+                                this.sprite2.draw(canvas, this.x, this.y);
+                            } else if (cont_sprite_time < 70)
+                            {
+                                this.sprite3.draw(canvas, this.x, this.y);
+                            }
+                            else if (cont_sprite_time < 80)
+                            {
+                                this.sprite4.draw(canvas, this.x, this.y);
+                            }
+                            else {
+                                this.sprite4.draw(canvas, this.x, this.y);
+                                cont_sprite_time = 0;
+                            }
+                        }
+                        else if (this.x_antigo < this.x) {
+                            if (cont_sprite_time < 30)
+                            {
+                                this.sprite5.draw(canvas, this.x, this.y);
+                            } else if (cont_sprite_time < 40)
+                            {
+                                this.sprite6.draw(canvas, this.x, this.y);
+                            } else if (cont_sprite_time < 70)
+                            {
+                                this.sprite7.draw(canvas, this.x, this.y);
+                            }
+                            else if (cont_sprite_time < 80)
+                            {
+                                this.sprite8.draw(canvas, this.x, this.y);
+                            }
+                            else {
+                                this.sprite8.draw(canvas, this.x, this.y);
+                                cont_sprite_time = 0;
+                            }
+                        }
+                        else {
+
+                            if (cont_sprite_time < 30)
+                            {
+                                this.sprite9.draw(canvas, this.x, this.y);
+                            } else if (cont_sprite_time < 40)
+                            {
+                                this.sprite10.draw(canvas, this.x, this.y);
+                            } else if (cont_sprite_time < 70)
+                            {
+                                this.sprite11.draw(canvas, this.x, this.y);
+                            }
+                            else if (cont_sprite_time < 80)
+                            {
+                                this.sprite12.draw(canvas, this.x, this.y);
+                            }
+                            else {
+                                this.sprite12.draw(canvas, this.x, this.y);
+                                cont_sprite_time = 0;
+                            }
+
+                        }
+
+                    },
+                    move: function(incremento)
+                    {
+
+                        if (incremento < 0) {
+                            for (var i = incremento; i < 0; i++) {
+
+                                if ((this.x - 1) >= 0 && (this.x - 1) <= (CANVAS_WIDTH_LARGURA - this.height)) {
+                                    this.x_antigo = this.x;
+                                    this.x -= 1;
+                                }
+
+                            }
+                        }
+                        else if (incremento > 0) {
+                            for (var i = 0; i < incremento; i++) {
+
+                                if ((this.x + 1) >= 0 && (this.x + 1) <= (CANVAS_WIDTH_LARGURA - this.height)) {
+                                    this.x_antigo = this.x;
+                                    this.x += 1;
+                                }
+
+                            }
+                        }
+                        else {
+                            temp = this.x;
+                            this.x = temp;
+                            this.x_antigo = temp;
+                        }
+
+                    },
+                }
+            }
+
+
+
+
+
+
+            function criadorAlimentos(novoAlimento)
+            {
+
+                //define a quantidade/diversidade de alimentos
+                var qtd_alimentos = 15;
+
+                //Define aleatorioamente qual alimento sera criado.
+                var tipo_randomico = parseInt((Math.random() * qtd_alimentos) + 1);
+                novoAlimento = novoAlimento || {};
+                novoAlimento.tipo_randomico = parseInt((Math.random() * qtd_alimentos) + 1);
+                novoAlimento.active = true;
+                novoAlimento.age = Math.floor(Math.random() * 1);
+                novoAlimento.pontos = qtd_alimentos * fase;
+                novoAlimento.color = "#FFF";
+                novoAlimento.width = 32;
+                novoAlimento.height = 32;
+                novoAlimento.x = (CANVAS_WIDTH_LARGURA - novoAlimento.width) * Math.random();
+                novoAlimento.y = -(novoAlimento.height);
+                novoAlimento.xVelocity = 0
+                novoAlimento.yVelocity = 1 + (tipo_randomico / 5) * fase;
+                novoAlimento.sprite = Sprite("alimento_" + tipo_randomico);
+                novoAlimento.inBounds = function()
+                {
+                    return novoAlimento.x >= 0 && novoAlimento.x <= CANVAS_WIDTH_LARGURA && novoAlimento.y >= 0 && novoAlimento.y <= CANVAS_HEIGHT_ALTURA;
+                };
+                novoAlimento.catColision = function()
+                {
+                    if (this.y + this.height >= player.y + 20 && this.y < player.y + 30) {
+                        var aj = player.x + 15;
+                        var ak = player.x + player.width - 15;
+                        var bj = this.x;
+                        var bk = this.x + this.width;
+                        if (bj >= aj && bj < ak || bk <= ak && bk > aj) {
+                            return true;
+                        }
+                    }
+                    return false;
+                };
+                novoAlimento.draw = function()
+                {
+                    if (novoAlimento.active)
+                        this.sprite.draw(canvas, this.x, this.y);
+                };
+                novoAlimento.update = function()
+                {
+                    novoAlimento.x += novoAlimento.xVelocity;
+                    novoAlimento.y += novoAlimento.yVelocity;
+                    novoAlimento.xVelocity = 100 * Math.sin(novoAlimento.age * Math.PI / 1);
+                    novoAlimento.age++;
+                    if (novoAlimento.inBounds()) {
+                        novoAlimento.active = novoAlimento.active && novoAlimento.inBounds();
+                        if (novoAlimento.catColision() && this.active) {
+                            qtd_pontos += this.pontos;
+                            this.active = false;
+                        }
+                    }
+                    else {
+                        delete novoAlimento;
+                    }
+                };
+                return novoAlimento;
+            }
+
+
+
+
+
+            function disparadorDeBolas(novaBola)
+            {
+
+                novaBola = novaBola || {};
+                novaBola.active = true;
+                novaBola.age = Math.floor(Math.random() * 1);
+                novaBola.color = "#FFF";
+                novaBola.width = 32;
+                novaBola.height = 32;
+                novaBola.x = player.x + player.height / 2 - novaBola.height / 2;
+                novaBola.y = player.y;
+                novaBola.xVelocity = 0;
+                novaBola.yVelocity = -3;
+                novaBola.sprite = Sprite("ball_pelo");
+                novaBola.inBounds = function()
+                {
+                    return novaBola.x >= 0 && novaBola.x <= CANVAS_WIDTH_LARGURA && novaBola.y >= 0 && novaBola.y <= CANVAS_HEIGHT_ALTURA;
+                };
+                novaBola.draw = function()
+                {
+                    this.sprite.draw(canvas, this.x, this.y);
+                };
+                novaBola.update = function()
+                {
+                    novaBola.x += novaBola.xVelocity;
+                    novaBola.y += novaBola.yVelocity;
+                    novaBola.xVelocity = 100 * Math.sin(novaBola.age * Math.PI / 1);
+                    novaBola.age++;
+                    novaBola.active = novaBola.active && novaBola.inBounds();
+                };
+                return novaBola;
+            }
+
+
+
+
+
+
+
+
+
+
+
+            var sound_volume = 100;
+            var son;
+
+            function SoundStart()
+            {
+                if (son == null) {
+                    son = document.createElement("embed");
+                    son.setAttribute("src", "musica2.mp3");
+                    son.setAttribute("hidden", "false");
+                    son.setAttribute("volume", 100);
+                    son.setAttribute("autostart", "true");
+                    son.setAttribute("loop", "false");
+                    document.body.appendChild(son);
+                }
+
+            }
+
+            function SoundMute()
+            {
+                if (sound_volume == 100) {
+                    document.getElementById("bt_mute").style.backgroundImage = "url(images/botoes/bt_som_on.png)";
+                    sound_volume = 0;
+                    document.getElementById('quadro_help').volume = sound_volume;
+                }
+                else {
+                    document.getElementById("bt_mute").style.backgroundImage = "url(images/botoes/bt_som_off.png)";
+                    sound_volume = 100;
+                    document.getElementById('quadro_help').volume = sound_volume;
+                }
+            }
+
+        </script>
+
+        <title> Hungry Cat  =＾● ω ●＾=  </title>  
+
+    </head>
+
+    <body>
+
+
+        <embed id="musica" src="musica2.mp3" autostart="true" hidden="true" loop="true"></embed>
+
+        <div id="div_canvas">
+            <canvas width="800" height="600" id="div_do_canvas"> </canvas>
+
+
+
+            <div id="bt_PlayGame" onclick="inicializaJogo();"><br/></div>
+
+            <div id="bt_PauseGame" onclick="pausaJogo();"><br/></div>
+
+            <div id="bt_mute" onclick="SoundMute();"></div>
+
+            <div id="bt_start" onclick="inicializaJogo();"></div>
+
+            <div id="div_cat"></div>
+
+            <div id="bt_info" onclick="document.getElementById('quadro_help').style.visibility = 'visible'"></div>
+
+            <div id="quadro_pause" onclick="pausaJogo();">
+            </div>
+
+            <div id="quadro_help" onclick="document.getElementById('quadro_help').style.visibility = 'hidden'">
+                <div class="creditos">
+                    <p style="text-align: center;"><img src="images/teclas.png" height="146" width="435" style=""></p>
+                    <h2><span id="alimento_credito"></span>Creditos</h2>
+                    <span id="alimento_nome1"></span><h3>Denis Benvenuti<span class="rgm">000000-0</span></h3>
+                    <span id="alimento_nome2"></span><h3>Grabrielle Ghenov<span class="rgm">000000-0</span></h3>
+                    <span id="alimento_nome3"></span><h3>Manuela Reis<span class="rgm">000000-0</span></h3>
+                    <span id="alimento_nome4"></span><h3>Ricardo Mendonça<span class="rgm">000000-0</span></h3>
+                    <span id="alimento_nome5"></span><h3>Thales Bezerra<span class="rgm">000000-0</span></h3>
+                </div>
+            </div>
+
+        </div>
+    </body>
+<style type="text/css">
+.creditos {
+width: 350px;
+margin: 0 auto;
+}
+    #quadro_help h2{
+        text-align: left;
+        padding:0;
+        margin: 0;
+        font-family: arial;
+        color:#fc821b;
+        width: 140px;
+        margin: 0 auto;
+        padding-bottom: 20px;
+    }
+    #alimento_credito{
+        background: url(images/alimento_1.png)no-repeat;width: 35px;height: 35px;float: left;
+    }
+    #quadro_help h3{
+        text-align: left;
+        font-size: 20px;
+        font-family: arial;
+        color:#003e9a;
+        padding: 5px 0px;
+        margin: 0;
+    }
+   .rgm {
+font-size: 20px;
+font-family: arial;
+color: #0450c0;
+float: right;
+}
+#alimento_nome1{background: url(images/alimento_6.png)no-repeat;width: 35px;height: 35px;float: left;padding-right: 10px;}
+#alimento_nome2{background: url(images/alimento_6.png)no-repeat;width: 35px;height: 35px;float: left;padding-right: 10px;}
+#alimento_nome3{background: url(images/alimento_6.png)no-repeat;width: 35px;height: 35px;float: left;padding-right: 10px;}
+#alimento_nome4{background: url(images/alimento_6.png)no-repeat;width: 35px;height: 35px;float: left;padding-right: 10px;}
+#alimento_nome5{background: url(images/alimento_6.png)no-repeat;width: 35px;height: 35px;float: left;padding-right: 10px;}
+</style>
+</html>
